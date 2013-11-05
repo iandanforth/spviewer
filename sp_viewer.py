@@ -41,6 +41,7 @@ class SPViewer(object):
     self.patchOverlapPercent = patchOverlapPercent
     self.epochCount = epochCount
     self.replayDelay = replayDelay
+    self.layout = layout
     self.featuresCount = self.sp._columnDimensions
     
     # Start up our display
@@ -52,6 +53,9 @@ class SPViewer(object):
     
     # Start with a blank white canvas
     self.screen.fill(THECOLORS['white'])
+    
+    # Add labels
+    self._drawLabels(self.layout)
 
   def run(self):
     
@@ -188,6 +192,35 @@ class SPViewer(object):
     width = 1
     pygame.draw.rect(self.screen, color, rect, width)
 
+  def _drawLabels(self, layout):
+    '''
+    Draws the sections labels to the screen
+    '''
+    # Display some text
+    font = pygame.font.Font(None, 18)
+    text = font.render("Input Image", 1, (10, 10, 10))
+    textpos = text.get_rect()
+    self.screen.blit(text, (30, 10))
+    
+    text = font.render("SP View", 1, (10, 10, 10))
+    textpos = text.get_rect()
+    self.screen.blit(text, (150, 10))
+    
+    text = font.render("Activity", 1, (10, 10, 10))
+    textpos = text.get_rect()
+    self.screen.blit(text, (210, 10))
+    
+    text = font.render("Perms", 1, (10, 10, 10))
+    textpos = text.get_rect()
+    self.screen.blit(text, (270, 10))
+    
+    text = font.render("Connected", 1, (10, 10, 10))
+    textpos = text.get_rect()
+    self.screen.blit(text, (320, 10))
+    
+    text = font.render("Feature Maps", 1, (10, 10, 10))
+    textpos = text.get_rect()
+    self.screen.blit(text, (400, 10))
 
   def _drawPatch(self, im, x, y):
     '''

@@ -1,5 +1,3 @@
-#! /usr/bin/env python
-
 import numpy
 import math
 import pygame
@@ -12,29 +10,53 @@ from nupic.research.spatial_pooler import SpatialPooler
 
 DEBUG = 0
 
-
-class SpatialPoolerVisualization(object):
+class SPViewer(object):
+  '''
+  This class provides a PyGame window that visualizes the behavior of the
+  Numenta Spatial Pooler algorithm for very small image inputs.
   
-  def __init__(self):
+  It is meant as an educational tool. As you change the parameters to the
+  SP you will get a better understanding of the errors that learning
+  algorithms such as the SP can make, and the strategies the SP uses to
+  overcome those errors.
+  '''
+  
+  def __init__(self,
+               sp,
+               screenWidth = 512,
+               screenHeight = 512,
+               imagePath = None,
+               patchSide = 32,
+               patchOverlapPercent = 0,
+               epochCount = 40,
+               replayDelay = 0,
+               layout = None):
+    
+    # Store properties
+    self.sp = sp
+    self.screenWidth = screenWidth
+    self.screenHeight = screenHeight
+    self.imagePath = imagePath
+    self.patchSide = patchSide
+    self.patchOverlapPercent = patchOverlapPercent
+    self.epochCount = epochCount
+    self.replayDelay = replayDelay
+    self.featuresCount = self.sp._columnDimensions
     
     # Start up our display
     pygame.init()
     
     # Set up our screen
-    size = self.screenWidth, self.screenHeight = 512, 512
+    size = self.screenWidth, self.screenHeight
     self.screen = pygame.display.set_mode(size)
     
     # Start with a blank white canvas
     self.screen.fill(THECOLORS['white'])
-    
-    # Define what counts as a connected synapse
-    self.synPermConnected = 0.1
 
   def run(self):
     
     # Display the input image we'll be learning on
-    imageName = 'Image3.jpg'
-    inputImage = pygame.image.load(imageName).convert()
+    inputImage = pygame.image.load(self.imagePath).convert()
     
     # Far left and centered vertically
     iiX = 0
@@ -45,44 +67,22 @@ class SpatialPoolerVisualization(object):
     self._drawBoundingBox(inputImage, iiX, iiY)
     
     # Get some image patches on which to train
-    patchSide = 32
-    patchOverlapPercent = 0.0
-    imagePatches = self._getPatchesFromImage(imageName,
-                                       patchSide,
-                                       patchOverlapPercent)
+    imagePatches = self._getPatchesFromImage(self.imagePath,
+                                             self.patchSide,
+                                             self.patchOverlapPercent)
     # Convert those to bit vectors for input into CLA
     vectorPatches = [self._convertToVector(patch[0]) for patch in imagePatches]
-    inputVectorLength = patchSide**2
+    inputVectorLength = self.patchSide**2
 
     # An array to store the Activity state of the neurons
-    featuresCount = 16
-    activeArray = numpy.zeros(featuresCount)
-    
-    # Instantiate our spatial pooler
-    sp = SpatialPooler(
-        inputDimensions = inputVectorLength, # Size of image patch
-        columnDimensions = featuresCount, # Number of potential features
-        potentialRadius = 10000, # Ensures 100% potential pool
-        potentialPct = 1, # Neurons can connect to 100% of input
-        globalInhibition = True,
-        numActiveColumnsPerInhArea = 1, # Only one feature active at a time
-        # All input activity can contribute to feature output
-        stimulusThreshold = 0,
-        synPermInactiveDec = 0.01,
-        synPermActiveInc = 0.1,
-        synPermConnected = self.synPermConnected, # Connected threshold
-        maxBoost = 3, # Turn off boosting
-        seed = 1956, # The seed that Grok uses
-        spVerbosity = 1,
-        addNoise = False)
+
+    activeArray = numpy.zeros(self.featuresCount)
     
     # Draw permanences before any input or learning
-    self._drawPermanences(sp, patchSide, featuresCount)
+    self._drawPermanences()
     
     # Feed in data and visualize the evolution of the permanences
-    epochCount = 40
-    replaySpeed = 0
-    for i in range(1, epochCount + 1):
+    for i in range(1, self.epochCount + 1):
       
       print "Epoch:", i
       columnEpochHistory = []
@@ -101,7 +101,7 @@ class SpatialPoolerVisualization(object):
         self.screen.blit(inputImage, (iiX, iiY))
 
         # Update the network
-        sp.compute(patch, True, activeArray)
+        self.sp.compute(patch, True, activeArray)
         
         # Draw column activations
         self._drawColumnActivity(activeArray)
@@ -110,10 +110,10 @@ class SpatialPoolerVisualization(object):
         columnEpochHistory.append(copy(activeArray))
         
         # Slow things down for viewing
-        time.sleep(replaySpeed)
+        time.sleep(self.replayDelay)
       
       # Display our perms after each epoch
-      self._drawPermanences(sp, patchSide, featuresCount)
+      self._drawPermanences()
       
       # Draw feature maps
       self._drawFeatureMaps(columnEpochHistory)
@@ -212,14 +212,14 @@ class SpatialPoolerVisualization(object):
     pygame.display.flip()
 
 
-  def _drawPermanences(self, sp, patchSide, featuresCount):
+  def _drawPermanences(self):
     
-    for i in range(featuresCount):
-      perms = sp._permanences.getRow(i)
+    for i in range(self.featuresCount):
+      perms = self.sp._permanences.getRow(i)
       # Convert perms to RGB (effective grayscale) values
       allPerms = [(v, v, v) for v in ((1 - perms) * 255).astype('int')]
       
-      connectedPerms = perms >= self.synPermConnected
+      connectedPerms = perms >= self.sp._synPermConnected
       connectedPerms = (numpy.invert(connectedPerms) * 255).astype('int')
       connectedPerms = [(v, v, v) for v in connectedPerms]
       
@@ -234,12 +234,12 @@ class SpatialPoolerVisualization(object):
       
       # Define where we'll draw that on the screen
       xOffset = 272
-      yOffSet = (.5 * self.screenHeight) - (.5 * (featuresCount * size[1]))
+      yOffSet = (.5 * self.screenHeight) - (.5 * (self.featuresCount * size[1]))
       
       # Line
       x = xOffset
       x2 = x + 64
-      y = yOffSet + i * patchSide
+      y = yOffSet + i * self.patchSide
       
       # Square
       #x = (i % 4 * patchSide) + xOffset
@@ -397,8 +397,4 @@ class SpatialPoolerVisualization(object):
       y2 += move
 
     return patches
-
-
-
-if __name__ == "__main__":
-  SpatialPoolerVisualization().run()
+  

@@ -192,35 +192,33 @@ class SPViewer(object):
     width = 1
     pygame.draw.rect(self.screen, color, rect, width)
 
+
   def _drawLabels(self, layout):
     '''
     Draws the sections labels to the screen
+    
+    TODO: Make this use a proper layout
     '''
     # Display some text
     font = pygame.font.Font(None, 18)
     text = font.render("Input Image", 1, (10, 10, 10))
-    textpos = text.get_rect()
     self.screen.blit(text, (30, 10))
     
     text = font.render("SP View", 1, (10, 10, 10))
-    textpos = text.get_rect()
     self.screen.blit(text, (150, 10))
     
     text = font.render("Activity", 1, (10, 10, 10))
-    textpos = text.get_rect()
     self.screen.blit(text, (210, 10))
     
     text = font.render("Perms", 1, (10, 10, 10))
-    textpos = text.get_rect()
     self.screen.blit(text, (270, 10))
     
     text = font.render("Connected", 1, (10, 10, 10))
-    textpos = text.get_rect()
     self.screen.blit(text, (320, 10))
     
     text = font.render("Feature Maps", 1, (10, 10, 10))
-    textpos = text.get_rect()
     self.screen.blit(text, (400, 10))
+
 
   def _drawPatch(self, im, x, y):
     '''
@@ -228,8 +226,9 @@ class SPViewer(object):
     
       patch - a PIL image object
       x, y - coords of where to draw the patch on screen
+      
+    TODO: Show the B+W converted version which is what SP actually gets
     '''
-    
     mode = im.mode
     size = im.size
     data = im.tostring()

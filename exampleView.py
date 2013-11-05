@@ -1,4 +1,14 @@
 #! /usr/bin/env python
+'''
+This script wraps the SP Viewer so that you can tweak parameters easily.
+
+Things to explore:
+
+- Various Images (Image1-3 provided)
+- The effect of Boosting
+- The effect of increment and decrement sizes
+- Changing the overlap percent on the patches the SP sees (0.0 - 1.0)
+'''
 
 from sp_viewer import SPViewer
 from nupic.research.spatial_pooler import SpatialPooler
@@ -20,14 +30,16 @@ def main():
       synPermConnected = 0.1, # Connected threshold
       maxBoost = 3,
       seed = 1956, # The seed that Grok uses
-      spVerbosity = 1,
-      addNoise = False)
+      spVerbosity = 1)
   
   viewer = SPViewer(sp,
                     screenWidth = 512,
                     screenHeight = 600,
                     imagePath = 'data/Image2.jpg',
-                    replayDelay = .2)
+                    patchSide = 32,
+                    patchOverlapPercent = 0,
+                    epochCount = 40,
+                    replayDelay = .1)
   viewer.run()
 
 

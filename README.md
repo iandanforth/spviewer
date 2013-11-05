@@ -6,7 +6,7 @@ A very simple, visual example of the Spatial Pooler algorithm in operation.
 Modifying the parameters set in exampleView.py can help you explore how
 the spatial pooler works.
 
-Caveats -
+Caveats
 
 - Currently this uses the new python implementation of the SP, which is not the
   default
@@ -18,7 +18,7 @@ Caveats -
   works well for image data, and makes the SP comparable to more mainline work.
 
 
-Requirements:
+Requirements
 
 - NuPIC
 - PIL

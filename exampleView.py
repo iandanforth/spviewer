@@ -23,7 +23,7 @@ def main():
       potentialRadius = 10000, # Ensures 100% potential pool
       potentialPct = 1, # Neurons can connect to 100% of input
       globalInhibition = True,
-      numActiveColumnsPerInhArea = 3, # Only one feature active at a time
+      numActiveColumnsPerInhArea = 1, # Only one feature active at a time
       # All input activity can contribute to feature output
       stimulusThreshold = 0,
       synPermInactiveDec = 0.1,

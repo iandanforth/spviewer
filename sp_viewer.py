@@ -106,7 +106,7 @@ class SPViewer(object):
 
         # Update the network
         self.sp.compute(patch, True, activeArray)
-
+        
         # Draw column activations
         self._drawColumnActivity(activeArray)
         
@@ -115,7 +115,7 @@ class SPViewer(object):
         
         # Slow things down for viewing
         time.sleep(self.replayDelay)
-
+      
       # Display our perms after each epoch
       self._drawPermanences()
       

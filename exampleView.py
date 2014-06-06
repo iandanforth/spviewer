@@ -12,6 +12,7 @@ Things to explore:
 
 from sp_viewer import SPViewer
 from nupic.research.spatial_pooler import SpatialPooler
+import pygame
 
 def main():
   
@@ -25,7 +26,7 @@ def main():
       numActiveColumnsPerInhArea = 1, # Only one feature active at a time
       # All input activity can contribute to feature output
       stimulusThreshold = 0,
-      synPermInactiveDec = 0.01,
+      synPermInactiveDec = 0.1,
       synPermActiveInc = 0.1,
       synPermConnected = 0.1, # Connected threshold
       maxBoost = 3,
@@ -41,6 +42,9 @@ def main():
                     epochCount = 40,
                     replayDelay = .1)
   viewer.run()
+
+  finalWindow = viewer.screen
+  pygame.image.save(finalWindow, "screenshot.jpg")
 
 
 if __name__ == "__main__":

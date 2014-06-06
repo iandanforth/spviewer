@@ -106,7 +106,7 @@ class SPViewer(object):
 
         # Update the network
         self.sp.compute(patch, True, activeArray)
-        
+
         # Draw column activations
         self._drawColumnActivity(activeArray)
         
@@ -115,7 +115,7 @@ class SPViewer(object):
         
         # Slow things down for viewing
         time.sleep(self.replayDelay)
-      
+
       # Display our perms after each epoch
       self._drawPermanences()
       
@@ -156,7 +156,7 @@ class SPViewer(object):
     Returns a bit vector representation (list of ints) of a PIL image.
     '''
     # Convert the image to black and white
-    image = image.convert('1')
+    image = image.convert('1',dither=Image.NONE)
     # Pull out the data, turn that into a list, then a numpy array,
     # then convert from 0 255 space to binary with a threshold.
     # Finnally cast the values into a type CPP likes
